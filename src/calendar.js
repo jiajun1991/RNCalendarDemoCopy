@@ -7,7 +7,8 @@ import {
     Text,
     Dimensions,
     FlatList,
-    Button
+    Button,
+    ScrollView
 } from 'react-native'
 import { Colors } from 'react-native/Libraries/NewAppScreen'
 import { range } from 'lodash'
@@ -273,7 +274,8 @@ class CalendarView extends Component {
 
     render() {
         return (
-            <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
+            <ScrollView>
+<View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
                 <View style={styles.titleBack}>
                     <Text style={styles.title}>日历</Text>
                 </View>
@@ -315,7 +317,11 @@ class CalendarView extends Component {
                         {this.renderWeeks()}
                     </View>
                 </View>
+                {/* 任务list */}
+                <FlatList data={[1,2,3,4,5,6,7,8,9,10]} renderItem={({item}) => <View style={styles.taskItem}><Text>{item}</Text></View>}></FlatList>
             </View>
+            </ScrollView>
+            
         )
     }
 }
@@ -384,6 +390,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#4169E1',
         fontSize: 20,
+    },
+    taskItem:{
+        height:30
     }
 })
 
