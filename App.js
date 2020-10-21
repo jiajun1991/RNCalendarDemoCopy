@@ -6,88 +6,84 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-  Modal,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  FlatList,
-} from 'react-native';
-
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
+import React ,{Component} from 'react';
 import moment from 'moment'
+import CalendarView from './src/calendar'
+import {StyleSheet,StatusBar,SafeAreaView} from 'react-native'
 
-const {width,height} = Dimensions.get('window')
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid'
-
-
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
+class App extends Component {
+  render() {
+    return (
       <SafeAreaView>
-      <FullCalendar
-        plugins={[ dayGridPlugin ]}
-        initialView="dayGridMonth"
-      />
+<CalendarView></CalendarView>
       </SafeAreaView>
-    </>
-  );
-};
+      
+    )
+  }
+}
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
+// const App: () => React$Node = () => {
+  
+//   return (
+//     <>
+//       <StatusBar barStyle="dark-content" />
+//       <SafeAreaView>
+//       <View>
+//         <TouchableOpacity onPress= {onPressPrevious}>
+//           <Text style = {styles.previousBtn} >上一个</Text>
+//         </TouchableOpacity>
+//         <TouchableOpacity onPress = {onPressNext}>
+//           <Text>下一个</Text>
+//         </TouchableOpacity>
+//       </View>
+//       </SafeAreaView>
+//     </>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   scrollView: {
+//     backgroundColor: Colors.lighter,
+//   },
+//   engine: {
+//     position: 'absolute',
+//     right: 0,
+//   },
+//   body: {
+//     backgroundColor: Colors.white,
+//   },
+//   sectionContainer: {
+//     marginTop: 32,
+//     paddingHorizontal: 24,
+//   },
+//   sectionTitle: {
+//     fontSize: 24,
+//     fontWeight: '600',
+//     color: Colors.black,
+//   },
+//   sectionDescription: {
+//     marginTop: 8,
+//     fontSize: 18,
+//     fontWeight: '400',
+//     color: Colors.dark,
+//   },
+//   highlight: {
+//     fontWeight: '700',
+//   },
+//   footer: {
+//     color: Colors.dark,
+//     fontSize: 12,
+//     fontWeight: '600',
+//     padding: 4,
+//     paddingRight: 12,
+//     textAlign: 'right',
+//   },
+//   previousBtn: {
+//     color:Colors.black,
+//     fontSize:18,
+//     fontWeight:'600',
+//     textAlign:"center"
+//   }
+// });
 
 export default App;
