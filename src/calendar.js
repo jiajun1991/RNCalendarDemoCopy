@@ -20,13 +20,12 @@ var lastMonthArray = []
 var thisMonthArray = []
 var nextMonthArray = []
 
-
-
 class CalendarView extends Component {
     constructor(props) {
         super(props)
         this.state = {
             selectedDate: new Date(),
+            calendarType: 1 //1是月模式 2是周模式 3是日模式 
         }
         this.onPressToday = this.onPressToday.bind(this)
         this.onPressPrevious = this.onPressPrevious.bind(this)
@@ -35,6 +34,8 @@ class CalendarView extends Component {
         this.onPressWeek = this.onPressWeek.bind(this)
         this.onPressMonth = this.onPressMonth.bind(this)
         this.onPressSelectDay = this.onPressSelectDay.bind(this)
+        this.onPressSelectDayForWeekModal = this.onPressSelectDayForWeekModal.bind(this)
+        this.onPressMonthTitle = this.onPressMonthTitle.bind(this)
     }
 
 
@@ -42,7 +43,7 @@ class CalendarView extends Component {
     getCurrentMonthFirst() {
         console.log(this)
         var date = new Date(this.state.selectedDate.getTime())
-        console.log('创建一个新对象',date)
+        console.log('创建一个新对象', date)
         date.setDate(1)
         return date
     }
@@ -102,7 +103,7 @@ class CalendarView extends Component {
 
     //获取当前月最后一天的日期
     getCurrentMonthLast() {
-        var date = new Date(this.state.selectedDate.getTime()) 
+        var date = new Date(this.state.selectedDate.getTime())
         var currentMonth = date.getMonth();
         var nextMonth = ++currentMonth;
         var nextMonthFirstDay = new Date(date.getFullYear(), nextMonth, 1);
@@ -126,19 +127,19 @@ class CalendarView extends Component {
     }
 
     //获取下个月同一天
-    getNextMonthSameDay(date){
+    getNextMonthSameDay(date) {
         var tmpDate = new Date(date.getTime())
         var currentMonth = tmpDate.getMonth()
-        var nextMonth = currentMonth+1
+        var nextMonth = currentMonth + 1
         tmpDate.setMonth(nextMonth)
-        
+
         var nextMonthClone = new Date(tmpDate.getTime())
-        console.log('nextMonthClone======',nextMonthClone)
-        var nextNextMonth = moment().month(nextMonth+1).toDate() 
+        console.log('nextMonthClone======', nextMonthClone)
+        var nextNextMonth = moment().month(nextMonth + 1).toDate()
         nextNextMonth.setDate(1)
-        var nextMonthLast = this.getBeforeDayDate(nextNextMonth,1)
-        console.log('最后一天=====',nextMonthLast)
-        if (nextMonthLast.getDate()<tmpDate.getDate()) {
+        var nextMonthLast = this.getBeforeDayDate(nextNextMonth, 1)
+        console.log('最后一天=====', nextMonthLast)
+        if (nextMonthLast.getDate() < tmpDate.getDate()) {
             //返回最后一天
             return nextMonthLast
         }
@@ -148,17 +149,48 @@ class CalendarView extends Component {
 
     onPressNext() {
         console.log('下一月')
-        this.setState({
-            selectedDate: this.getNextMonthSameDay(this.state.selectedDate)
-        })
+        if (this.state.calendarType === 1){
+            //月模式
+            //下一月
+            this.setState({
+                selectedDate: this.getNextMonthSameDay(this.state.selectedDate)
+            })
+        }else if (this.state.calendarType === 2){
+            //周模式
+            this.setState({
+                selectedDate: moment(this.state.selectedDate).add(7,'days').toDate()
+            })
+        }else{
+            //天模式
+            this.setState({
+                selectedDate:moment(this.state.selectedDate).add(1,'days').toDate()
+            })
+        }
+        //切换下面列表数据
+        // TODO:
     }
 
     onPressPrevious() {
         console.log('上一月')
-        //上一月
+        if (this.state.calendarType === 1){
+            //月模式
+            //上一月
         this.setState({
             selectedDate: this.getLastMonthSameDay(this.state.selectedDate)
         })
+        }else if (this.state.calendarType === 2){
+            //周模式
+            this.setState({
+                selectedDate: moment(this.state.selectedDate).subtract(7,'days').toDate()
+            })
+        }else{
+            //天模式
+            this.setState({
+                selectedDate:moment(this.state.selectedDate).subtract(1,'days').toDate()
+            })
+        }
+        //切换下面列表数据
+        // TODO:
     }
 
     onPressToday() {
@@ -177,14 +209,39 @@ class CalendarView extends Component {
         )
     }
 
+    //周模式的点击某天
+    onPressSelectDayForWeekModal(date){
+        console.log('点击了',date)
+        this.setState(
+            {
+                selectedDate: date
+            }
+        )
+    }
+
+    //点击月份可以显示月维度的任务
+    onPressMonthTitle(month){
+        console.log('该月为',month+1)
+        //刷新列表
+    }
+
     onPressMonth() {
         console.log('切换为月')
+        this.setState({
+            calendarType: 1
+        })
     }
     onPressWeek() {
         console.log('切换为周')
+        this.setState({
+            calendarType: 2
+        })
     }
     onPressDay() {
         console.log('切换为日')
+        this.setState({
+            calendarType: 3
+        })
     }
 
 
@@ -201,8 +258,8 @@ class CalendarView extends Component {
         //日历一共有42天，最多包括上个月，这个月，下个月的日期，上个月和下个月的用灰色标识
         var past_month_days = this.getLastMonthDayArray()
         //range方法是左闭右开
-        var this_month_days = range(1, moment(this.state.selectedDate).daysInMonth()+1)
-        console.log('看看这个月的天数数组',this_month_days)
+        var this_month_days = range(1, moment(this.state.selectedDate).daysInMonth() + 1)
+        console.log('看看这个月的天数数组', this_month_days)
         var next_month_days = past_month_days.length + this_month_days === 42 ? [] :
             this.getNextMonthDayArray(42 - past_month_days.length - this_month_days.length)
         lastMonthArray = past_month_days
@@ -234,23 +291,54 @@ class CalendarView extends Component {
                         </TouchableOpacity></View>
                 )
             } else {
-                if(day === this.state.selectedDate.getDate()){
+                if (day === this.state.selectedDate.getDate()) {
                     return (
                         <View key={index} style={
                             styles.day
-                        }><TouchableOpacity onPress = {() => this.onPressSelectDay(day)}>
+                        }><TouchableOpacity onPress={() => this.onPressSelectDay(day)}>
                                 <Text style={styles.day_text_selected}>{day}</Text>
                             </TouchableOpacity></View>
                     )
-                }else{
+                } else {
                     return (
                         <View key={index} style={
                             styles.day
-                        }><TouchableOpacity onPress = {() => this.onPressSelectDay(day)}>
+                        }><TouchableOpacity onPress={() => this.onPressSelectDay(day)}>
                                 <Text style={styles.day_text}>{day}</Text>
                             </TouchableOpacity></View>
                     )
                 }
+            }
+        }
+        )
+    }
+
+    renderDaysForWeekModal() {
+
+        var momentSelected = moment(this.state.selectedDate)
+        var selectedDateIndex = momentSelected.day()
+        return range(0, 7).map((_, index) => {
+            var date = moment(momentSelected.day(index))
+            if (selectedDateIndex === index) {
+                console.log('被选择的moment-============', date.date())
+                return (
+                    <View key={index} style={
+                        styles.day
+                    }><TouchableOpacity onPress={() => this.onPressSelectDayForWeekModal(date.toDate())}>
+                            <Text style={styles.week_modal_day_text_selected}>{date.format('MM/DD')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                )
+            } else {
+                console.log('被选择的moment-============', date.date())
+                return (
+                    <View key={index} style={
+                        styles.day
+                    }><TouchableOpacity onPress={() => this.onPressSelectDayForWeekModal(date.toDate())}>
+                            <Text style={styles.week_modal_day_text}>{date.format('MM/DD')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                )
             }
         }
         )
@@ -272,56 +360,87 @@ class CalendarView extends Component {
         return weeks_r
     }
 
-    render() {
-        return (
-            <ScrollView>
-<View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
-                <View style={styles.titleBack}>
-                    <Text style={styles.title}>日历</Text>
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={{ flexDirection: "row", marginLeft: 17, marginTop: 17 }}>
-                        <TouchableOpacity onPress={this.onPressPrevious}>
-                            <Text style={styles.previousBtn} >上一个</Text>
-                        </TouchableOpacity>
-                        <View style={styles.horiSeprator} />
-                        <TouchableOpacity onPress={this.onPressNext}>
-                            <Text style={styles.previousBtn}>下一个</Text>
-                        </TouchableOpacity>
-                        <View style={styles.horiSeprator} />
-                        <TouchableOpacity onPress={this.onPressToday}>
-                            <Text style={styles.previousBtn}>今天</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginRight: 17, marginTop: 17 }}>
-                        <TouchableOpacity onPress={this.onPressMonth}>
-                            <Text style={styles.changeStatusBtn}>月</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={this.onPressWeek}>
-                            <Text style={styles.changeStatusBtn}>周</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={this.onPressDay}>
-                            <Text style={styles.changeStatusBtn}>日</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.titleBack}>
-                    <Text style={{ color: 'black', fontSize: 25, textAlign: 'center'}}>{this.state.selectedDate.toDateString()}</Text>
-                </View>
-                {/* 日历view */}
+    //周模式
+    renderCalendarView() {
+        if (this.state.calendarType === 1) {
+            console.log('这是月模式CalendarView')
+            return (
                 <View>
+                    {/* 月份 可点击，点击之后刷新列表为月份的列表 */}
+                    <View style = {{flexDirection:'row',justifyContent:'center'}}><TouchableOpacity onPress={()=>this.onPressMonthTitle(moment(this.state.selectedDate).month())}>
+            <Text style = {{fontSize: 25}}>{moment(this.state.selectedDate).format('MM月')}</Text></TouchableOpacity></View>
                     <View style={styles.calendar_weekdays}>
                         {this.renderWeekDays()}
                     </View>
-                    <View style={styles.calendar_days}>
+                    <View>
                         {this.renderWeeks()}
                     </View>
                 </View>
-                {/* 任务list */}
-                <FlatList data={[1,2,3,4,5,6,7,8,9,10]} renderItem={({item}) => <View style={styles.taskItem}><Text>{item}</Text></View>}></FlatList>
-            </View>
+            )
+        } else if (this.state.calendarType === 2) {
+            console.log('这是周模式CalendarView')
+            return (
+                <View>
+                    <View>
+                        <View style={styles.calendar_weekdays}>{this.renderWeekDays()}</View>
+                    </View>
+                    <View style={styles.week_days}>
+                        {this.renderDaysForWeekModal()}
+                    </View>
+                </View>
+            )
+        } else if (this.state.calendarType === 3) {
+            console.log('这是日模式CalendarView')
+            return (
+                <View>
+
+                </View>
+            )
+        }
+    }
+
+    render() {
+        return (
+            <ScrollView>
+                <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
+                    <View style={styles.titleBack}>
+                        <Text style={styles.title}>日历</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: "row", marginLeft: 17, marginTop: 17 }}>
+                            <TouchableOpacity onPress={this.onPressPrevious}>
+                                <Text style={styles.previousBtn} >上一个</Text>
+                            </TouchableOpacity>
+                            <View style={styles.horiSeprator} />
+                            <TouchableOpacity onPress={this.onPressNext}>
+                                <Text style={styles.previousBtn}>下一个</Text>
+                            </TouchableOpacity>
+                            <View style={styles.horiSeprator} />
+                            <TouchableOpacity onPress={this.onPressToday}>
+                                <Text style={styles.previousBtn}>今天</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ flexDirection: 'row', marginRight: 17, marginTop: 17 }}>
+                            <TouchableOpacity onPress={this.onPressMonth}>
+                                <Text style={styles.changeStatusBtn}>月</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this.onPressWeek}>
+                                <Text style={styles.changeStatusBtn}>周</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this.onPressDay}>
+                                <Text style={styles.changeStatusBtn}>日</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={styles.titleBack}>
+                        <Text style={{ color: 'black', fontSize: 25, textAlign: 'center' }}>{this.state.selectedDate.toDateString()}</Text>
+                    </View>
+                    {this.renderCalendarView()}
+                    {/* 任务list */}
+                    <FlatList data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} renderItem={({ item }) => <View style={styles.taskItem}><Text>{item}</Text></View>}></FlatList>
+                </View>
             </ScrollView>
-            
+
         )
     }
 }
@@ -391,8 +510,18 @@ const styles = StyleSheet.create({
         color: '#4169E1',
         fontSize: 20,
     },
-    taskItem:{
-        height:30
+    taskItem: {
+        height: 30
+    },
+    week_modal_day_text:{
+        textAlign: 'center',
+        color: 'black',
+        fontSize: 14,
+    },
+    week_modal_day_text_selected:{
+        textAlign: 'center',
+        color: '#4169E1',
+        fontSize: 14,
     }
 })
 
