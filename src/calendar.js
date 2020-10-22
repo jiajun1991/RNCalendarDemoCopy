@@ -43,7 +43,6 @@ class CalendarView extends Component {
     getCurrentMonthFirst() {
         console.log(this)
         var date = new Date(this.state.selectedDate.getTime())
-        console.log('创建一个新对象', date)
         date.setDate(1)
         return date
     }
@@ -128,22 +127,7 @@ class CalendarView extends Component {
 
     //获取下个月同一天
     getNextMonthSameDay(date) {
-        var tmpDate = new Date(date.getTime())
-        var currentMonth = tmpDate.getMonth()
-        var nextMonth = currentMonth + 1
-        tmpDate.setMonth(nextMonth)
-
-        var nextMonthClone = new Date(tmpDate.getTime())
-        console.log('nextMonthClone======', nextMonthClone)
-        var nextNextMonth = moment().month(nextMonth + 1).toDate()
-        nextNextMonth.setDate(1)
-        var nextMonthLast = this.getBeforeDayDate(nextNextMonth, 1)
-        console.log('最后一天=====', nextMonthLast)
-        if (nextMonthLast.getDate() < tmpDate.getDate()) {
-            //返回最后一天
-            return nextMonthLast
-        }
-        return tmpDate
+        return moment(date).add(1,'months').toDate()
     }
 
 
@@ -259,7 +243,6 @@ class CalendarView extends Component {
         var past_month_days = this.getLastMonthDayArray()
         //range方法是左闭右开
         var this_month_days = range(1, moment(this.state.selectedDate).daysInMonth() + 1)
-        console.log('看看这个月的天数数组', this_month_days)
         var next_month_days = past_month_days.length + this_month_days === 42 ? [] :
             this.getNextMonthDayArray(42 - past_month_days.length - this_month_days.length)
         lastMonthArray = past_month_days
